@@ -17,7 +17,7 @@ def step(u1, u2):
 
 
 sock = socket.socket()
-sock.bind(('localhost', 50000))
+sock.bind(('62.217.177.130', 5500))
 sock.listen(2)
 
 user1, _ = sock.accept()

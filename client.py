@@ -118,7 +118,7 @@ def server_listener():
 
 
 server = socket.socket()
-server.connect(('localhost', 50000))
+server.connect(('62.217.177.130', 5500))
 
 app = QApplication([])
 window = MainWindow()
