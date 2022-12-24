@@ -73,6 +73,7 @@ class MainWindow(QMainWindow):
                     self.alert_label.setText(result)
                     self.my_step = False
                     timer.stop()
+                    server.close()
                 self.game_table.update()
                 return 0
             self.timers.append(time.time() + 0.5)
@@ -118,7 +119,7 @@ def server_listener():
 
 
 server = socket.socket()
-server.connect(('62.217.177.130', 5500))
+server.connect(('localhost', 5500))
 
 app = QApplication([])
 window = MainWindow()
