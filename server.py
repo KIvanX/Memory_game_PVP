@@ -23,18 +23,18 @@ def new_users():
         waiting_game.append(user)
         if len(waiting_game) >= 2:
             threading.Thread(target=game, args=(waiting_game[0], waiting_game[1])).start()
-            waiting_game.pop(1)
-            waiting_game.pop(0)
 
 
 def game(user1, user2):
-    nums = [str(i // 2 + 1) for i in range(36)]
-    random.shuffle(nums)
-    user1.send(('TABLE' + '_'.join(nums)).encode('utf8'))
-    user2.send(('TABLE' + '_'.join(nums)).encode('utf8'))
-    time.sleep(1)
-
     try:
+        nums = [str(i // 2 + 1) for i in range(36)]
+        random.shuffle(nums)
+        waiting_game.pop(0)
+        user1.send(('TABLE' + '_'.join(nums)).encode('utf8'))
+        waiting_game.pop(0)
+        user2.send(('TABLE' + '_'.join(nums)).encode('utf8'))
+        time.sleep(1)
+
         while True:
             num1 = num2 = 0
             while num1 == num2:

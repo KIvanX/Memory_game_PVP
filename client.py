@@ -3,7 +3,7 @@ from PyQt6.QtWidgets import QApplication, QMainWindow, QPushButton, QGridLayout,
 from PyQt6.QtGui import QFont
 from PyQt6 import QtCore
 import threading
-import socket
+import socket, sys
 import random
 import time
 
@@ -46,12 +46,14 @@ class MainWindow(QMainWindow):
                 self.game_table.addWidget(btn, i, j)
                 self.widgets[(i, j)] = btn
 
+        self.alert_label.setText('Ожидание игрока...')
         widget = QWidget()
         widget.setLayout(self.game_table)
         self.setCentralWidget(widget)
 
     def btn_click(self, i, j, from_server=False):
-        if (i, j) in window.clicked or (not self.my_step and not from_server):
+        global server, window, app
+        if (i, j) in self.clicked or (not self.my_step and not from_server):
             return 0
         if not from_server:
             server.send((str(i) + '_' + str(j)).encode('utf8'))
@@ -73,7 +75,6 @@ class MainWindow(QMainWindow):
                     self.alert_label.setText(result)
                     self.my_step = False
                     timer.stop()
-                    server.close()
                 self.game_table.update()
                 return 0
             self.timers.append(time.time() + 0.5)
@@ -104,7 +105,8 @@ def tick():
             i, j = window.server_events[0].split('_')
             window.btn_click(int(i), int(j), from_server=True)
         window.game_table.update()
-        window.server_events.pop(0)
+        if window.server_events:
+            window.server_events.pop(0)
 
     if window.timers and window.timers[0] < time.time():
         window.set_button(window.clicked[0][0], window.clicked[0][1], text='')
@@ -115,19 +117,25 @@ def tick():
 
 def server_listener():
     while True:
-        window.server_events.append(server.recv(1024).decode('utf8'))
+        try:
+            data = server.recv(1024).decode('utf8')
+            if data:
+                window.server_events.append(data)
+        except:
+            pass
 
 
 server = socket.socket()
 server.connect(('localhost', 5500))
 
 app = QApplication([])
-window = MainWindow()
-window.show()
 
 timer = QtCore.QTimer()
 timer.timeout.connect(tick)
 timer.start(100)
+
+window = MainWindow()
+window.show()
 
 threading.Thread(target=server_listener, daemon=True).start()
 app.exec()
