@@ -48,7 +48,7 @@ def game(user1, user2):
 
 
 sock = socket.socket()
-sock.bind(('localhost', 5500))
+sock.bind(('', 5500))
 sock.listen()
 
 waiting_game = []
